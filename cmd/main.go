@@ -48,4 +48,28 @@ func main() {
 	}
 
 	fmt.Printf("thread id: %v, run id: %v\n", threadID, runID)
+
+	response, err := client.GetResponse(threadID, runID, 1)
+	if err != nil {
+		fmt.Printf("GetResponse error: %v\n", err)
+		return
+	}
+	fmt.Printf("message: %v\n", response)
+
+	message = "These hires make sense, formalize this list in json format."
+
+	runID, err = client.SendMessageToAssistant(assistantID, threadID, message)
+	if err != nil {
+		fmt.Printf("SendMessageToAssistant error: %v\n", err)
+		return
+	}
+
+	fmt.Printf("run id: %v\n", runID)
+
+	response, err = client.GetResponse(threadID, runID, 1)
+	if err != nil {
+		fmt.Printf("GetResponse error: %v\n", err)
+		return
+	}
+	fmt.Printf("message: %v\n", response)
 }

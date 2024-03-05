@@ -3,6 +3,7 @@ package openai
 import (
 	"context"
 	"fmt"
+	"time"
 
 	openai "github.com/sashabaranov/go-openai"
 )
@@ -48,7 +49,7 @@ func (c *OpenAIClient) SendMessageToAssistantOnNewThread(assistantID string, mes
 		return
 	}
 
-	runID, err := c.SendMessageToAssistant(assistantID, thread.ID, message)
+	runID, err := c.triggerRun(assistantID, thread.ID)
 	if err != nil {
 		fmt.Printf("CreateThread error: %v\n", err)
 		return
@@ -56,7 +57,7 @@ func (c *OpenAIClient) SendMessageToAssistantOnNewThread(assistantID string, mes
 	return thread.ID, runID, err
 }
 
-func (c *OpenAIClient) SendMessageToAssistant(assistantID string, threadID string, message string) (runID string, err error) {
+func (c *OpenAIClient) triggerRun(assistantID string, threadID string) (runID string, err error) {
 	run, err := c.client.CreateRun(context.Background(), threadID,
 		openai.RunRequest{
 			AssistantID: assistantID,
@@ -67,4 +68,37 @@ func (c *OpenAIClient) SendMessageToAssistant(assistantID string, threadID strin
 	}
 
 	return run.ID, err
+}
+
+func (c *OpenAIClient) SendMessageToAssistant(assistantID string, threadID string, message string) (runID string, err error) {
+	_, err = c.client.CreateMessage(context.Background(), threadID,
+		openai.MessageRequest{
+			Role:    "user",
+			Content: message,
+		})
+	if err != nil {
+		fmt.Printf("CreateMessage error: %v\n", err)
+		return
+	}
+	return c.triggerRun(assistantID, threadID)
+}
+
+func (c *OpenAIClient) GetResponse(threadID string, runID string, limit int) (message string, err error) {
+	for {
+		run, err := c.client.RetrieveRun(context.Background(), threadID, runID)
+		if err != nil {
+			fmt.Printf("RetrieveRun error: %v\n", err)
+			// return "", err
+		}
+		if run.Status == openai.RunStatusCompleted {
+			messages, err := c.client.ListMessage(context.Background(), threadID, &limit, nil, nil, nil)
+			if err != nil {
+				fmt.Printf("ListMessage error: %v\n", err)
+				return "", err
+			}
+			return messages.Messages[0].Content[0].Text.Value, err
+		}
+		// Sleep for a short duration before checking the status again
+		time.Sleep(10 * time.Second)
+	}
 }
