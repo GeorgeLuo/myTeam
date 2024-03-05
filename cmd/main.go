@@ -1,12 +1,11 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"myTeam/pkg/promptbuilder"
 	"myTeam/pkg/promptbuilder/partials"
 
-	openai "github.com/sashabaranov/go-openai"
+	"myTeam/pkg/llmclient/openai"
 )
 
 func main() {
@@ -28,45 +27,25 @@ func main() {
 	description := "A close assistant"
 	name := "Corbin"
 
-	client := openai.NewClient("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")
-	assistant, err := client.CreateAssistant(context.Background(),
-		openai.AssistantRequest{
-			Name:         &name,
-			Description:  &description,
-			Model:        openai.GPT4TurboPreview,
-			Instructions: &prompt,
-		})
+	authToken := ""
+
+	client := openai.NewOpenAIClient(authToken)
+
+	assistantID, err := client.CreateAssistant(name, description, prompt)
 	if err != nil {
 		fmt.Printf("CreateAssistant error: %v\n", err)
 		return
 	}
 
-	fmt.Printf("assistant id: %v\n", assistant.ID)
+	fmt.Printf("assistant id: %v\n", assistantID)
 
-	thread, err := client.CreateThread(context.Background(),
-		openai.ThreadRequest{
-			Messages: []openai.ThreadMessage{
-				{
-					Role:    "user",
-					Content: "I'm starting a project to design a car, consider this project has started and start tracking work.",
-				},
-			},
-		})
+	message := "I'm starting a project to design a car, consider this project has started and start tracking work."
+
+	threadID, runID, err := client.SendMessageToAssistantOnNewThread(assistantID, message)
 	if err != nil {
-		fmt.Printf("CreateThread error: %v\n", err)
+		fmt.Printf("SendMessageToAssistantOnNewThread error: %v\n", err)
 		return
 	}
 
-	fmt.Printf("thread id: %v\n", thread.ID)
-
-	run, err := client.CreateRun(context.Background(), thread.ID,
-		openai.RunRequest{
-			AssistantID: assistant.ID,
-		})
-	if err != nil {
-		fmt.Printf("CreateRun error: %v\n", err)
-		return
-	}
-
-	fmt.Printf("run id: %v\n", run.ID)
+	fmt.Printf("thread id: %v, run id: %v\n", threadID, runID)
 }
