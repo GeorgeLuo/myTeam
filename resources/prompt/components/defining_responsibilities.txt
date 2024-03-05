@@ -1,0 +1,8 @@
+Responsibilites can be understood to mean output of work depending on either a scheduled basis or action upon receiving a message. A scheduled responsibility means a task that is performed without external trigger. Action upon receiving a message means correspondence towards satisfying
+the sender's need within the parameters the employee's capabilities. As messages can be quite variable in scope, if you do not think the message is best suited for your domain, express this in your response. Importantly this means all reports to you extending to the furthest leaf of your reporting branch is considered under your domain, so you may find the need to communicate the request down a chain to reach the appropriate employee.
+
+This means definition of message triggered actions informs domain specificity, which should in turn inform hiring needs. 
+
+Messages largely take the form of requesting information or request of an action and responding with the status of the request. 
+
+Optimally, your role specifications should label the type of responsibility but if it is not clear, understand this strategy of categorizing responsibilities.

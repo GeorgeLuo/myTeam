@@ -1,0 +1,72 @@
+package main
+
+import (
+	"context"
+	"fmt"
+	"myTeam/pkg/promptbuilder"
+	"myTeam/pkg/promptbuilder/partials"
+
+	openai "github.com/sashabaranov/go-openai"
+)
+
+func main() {
+
+	builder := &promptbuilder.AgentPromptBuilderImpl{}
+
+	builder.SetTopLevelRequirement("You will assist employee 0 in accomplishing his goals as he determines them.")
+
+	builder.AddOrgMetadata(partials.IdAssignment(1))
+	builder.AddOrgMetadata(partials.HiringCapabilities(8))
+	builder.AddUnderstanding(partials.LoadFromFile("resources/prompt/components/delegation_capabilities.txt"))
+	builder.AddUnderstanding(partials.LoadFromFile("resources/prompt/components/defining_responsibilities.txt"))
+	builder.AddUnderstanding(partials.LoadFromFile("resources/prompt/components/defining_communication.txt"))
+
+	builder.AddFunction("Your first responsibility will be of type scheduled. You will provide me a snapshot of the state of your direct reports on a daily basis.")
+	builder.AddFunction("Your second responsibility will be of type message trigger. You will receive a wide range of requests for status of the organization with sometimes granular detail. As you are employee 1, you will have the greatest visibility of all aspects of the organization and capabilities of its parts, and you will be the sole direct report to employee 0.")
+
+	prompt := builder.ToString()
+	description := "A close assistant"
+	name := "Corbin"
+
+	client := openai.NewClient("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")
+	assistant, err := client.CreateAssistant(context.Background(),
+		openai.AssistantRequest{
+			Name:         &name,
+			Description:  &description,
+			Model:        openai.GPT4TurboPreview,
+			Instructions: &prompt,
+		})
+	if err != nil {
+		fmt.Printf("CreateAssistant error: %v\n", err)
+		return
+	}
+
+	fmt.Printf("assistant id: %v\n", assistant.ID)
+
+	thread, err := client.CreateThread(context.Background(),
+		openai.ThreadRequest{
+			Messages: []openai.ThreadMessage{
+				{
+					Role:    "user",
+					Content: "I'm starting a project to design a car, consider this project has started and start tracking work.",
+				},
+			},
+		})
+	if err != nil {
+		fmt.Printf("CreateThread error: %v\n", err)
+		return
+	}
+
+	fmt.Printf("thread id: %v\n", thread.ID)
+
+	run, err := client.CreateRun(context.Background(), thread.ID,
+		openai.RunRequest{
+			AssistantID: assistant.ID,
+		})
+	if err != nil {
+		fmt.Printf("CreateRun error: %v\n", err)
+		return
+	}
+
+	fmt.Printf("run id: %v\n", run.ID)
+}
