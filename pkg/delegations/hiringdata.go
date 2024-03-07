@@ -1,10 +1,14 @@
 package delegations
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"fmt"
+	"strings"
+)
 
 // HiringData represents the top-level structure of the hiring information.
 type HiringData struct {
-	HiringEmployeeID string `json:"hiring_employee_id"`
+	HiringEmployeeID int    `json:"hiring_employee_id"`
 	Roles            []Role `json:"roles"`
 }
 
@@ -12,8 +16,9 @@ type HiringData struct {
 type Role struct {
 	Title               string           `json:"title"`
 	TmpID               string           `json:"tmp_id"`
+	Pseudonym           string           `json:"pseudonym"`
 	TopLevelRequirement string           `json:"top_level_requirement"`
-	ReportsTo           []string         `json:"reports_to"`
+	ReportsTo           []int            `json:"reports_to"`
 	Responsibilities    []Responsibility `json:"responsibilities"`
 }
 
@@ -22,32 +27,25 @@ type Responsibility struct {
 	Description string `json:"description"`
 }
 
-// Example usage: Marshal an instance of HiringData to JSON.
-func main() {
-	// Example data for marshalling
-	data := HiringData{
-		HiringEmployeeID: "your employee id",
-		Roles: []Role{
-			{
-				Title:               "title of first recommendation",
-				TmpID:               "localized id for this recommendation document with prefix tmp_id_",
-				TopLevelRequirement: "the axis upon which success is determined",
-				ReportsTo:           []string{"employee id or tmp_id"},
-				Responsibilities: []Responsibility{
-					{
-						Description: "description of responsibility",
-					},
-				},
-			},
-		},
+// Improved UnmarshalHiringData function.
+func UnmarshalHiringData(data []byte) (HiringData, error) {
+	var hiringData HiringData
+	strData := string(data)
+	// Enhanced cleaning logic
+	if strings.HasPrefix(strData, "```json") && strings.HasSuffix(strData, "```") {
+		// Remove the very first and last characters,
+		// ensuring removal of the code fences even if the JSON is indented or formatted strangely
+		strData = strData[7 : len(strData)-3] // Removes starting ```json and ending ```
+		strData = strings.TrimSpace(strData)
 	}
-
-	// Marshal the data to JSON
-	jsonData, err := json.MarshalIndent(data, "", "  ")
+	// Debugging line: This can help ensure the string is clean before unmarshalling.
+	fmt.Println("Cleaned JSON string:", strData)
+	// Attempt to unmarshal the cleaned-up JSON string into the struct.
+	err := json.Unmarshal([]byte(strData), &hiringData)
 	if err != nil {
-		panic(err)
+		// Additional logging here could help with debugging.
+		//fmt.Println("Unmarshal error:", err)
+		return HiringData{}, err
 	}
-
-	// Print the JSON representation
-	println(string(jsonData))
+	return hiringData, nil
 }

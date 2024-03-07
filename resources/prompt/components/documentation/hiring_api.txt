@@ -6,7 +6,8 @@ The following is documentation of how presentation of recommended hires should b
     "roles": [
         {
             "title": {title of first recommendation},
-            "tmp_id": {localized id for this recommendation document with prefix tmp_id_}
+            "tmp_id": {localized id for this recommendation document with prefix tmp_id_},
+            "pseudonym": {a codename-like id which is semi-random as to be unique within an organization},
             "top_level_requirement": {the axis upon which success is determined},
             "reports_to": [{employee id or tmp_id}...],
             "responsibilities": [

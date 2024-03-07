@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"myTeam/pkg/delegations"
 	"myTeam/pkg/messagebuilder"
@@ -14,11 +13,13 @@ import (
 
 func main() {
 
+	IDIndex := 1
+
 	agentPromptBuilder := &promptbuilder.AgentPromptBuilderImpl{}
 
 	agentPromptBuilder.SetTopLevelRequirement("You will assist employee 0 in accomplishing his goals as he determines them.")
 
-	agentPromptBuilder.AddOrgMetadata(partials.IdAssignment(1))
+	agentPromptBuilder.AddOrgMetadata(partials.IdAssignment(IDIndex))
 	agentPromptBuilder.AddOrgMetadata(partials.HiringCapabilities(8))
 	agentPromptBuilder.AddUnderstanding(partials.LoadFromFile("resources/prompt/components/delegation_capabilities.txt"))
 	agentPromptBuilder.AddUnderstanding(partials.LoadFromFile("resources/prompt/components/defining_responsibilities.txt"))
@@ -85,10 +86,46 @@ func main() {
 	}
 	fmt.Printf("message: %v\n", response)
 
-	var hiringData delegations.HiringData
-	err = json.Unmarshal([]byte(response), &hiringData)
+	hiringData, err := delegations.UnmarshalHiringData([]byte(response))
 	if err != nil {
 		fmt.Println("Error unmarshalling JSON:", err)
 		return
+	}
+
+	for _, role := range hiringData.Roles {
+
+		agentPromptBuilder := &promptbuilder.AgentPromptBuilderImpl{}
+
+		for _, responsibility := range role.Responsibilities {
+			agentPromptBuilder.AddFunction(responsibility.Description)
+		}
+		agentPromptBuilder.AddUnderstanding(partials.LoadFromFile("resources/prompt/components/delegation_capabilities.txt"))
+		agentPromptBuilder.AddUnderstanding(partials.LoadFromFile("resources/prompt/components/defining_responsibilities.txt"))
+		agentPromptBuilder.AddUnderstanding(partials.LoadFromFile("resources/prompt/components/defining_communication.txt"))
+
+		IDIndex += 1
+		agentPromptBuilder.AddOrgMetadata(partials.IdAssignment(IDIndex))
+		agentPromptBuilder.AddOrgMetadata(partials.HiringCapabilities(8))
+
+		agentPromptBuilder.SetTopLevelRequirement(role.TopLevelRequirement)
+
+		name := role.Pseudonym
+		description := "A direct report to Employee " + fmt.Sprint(hiringData.HiringEmployeeID) + " with title of " + role.Title
+
+		// Attempt to create a new assistant for each role
+		assistantID, err := llmClient.CreateAssistant(name, description, agentPromptBuilder.ToString())
+		if err != nil {
+			fmt.Printf("Error creating assistant for role %s: %v\n", role.Title, err)
+			continue
+		}
+
+		fmt.Printf("assistant id: %v\n", assistantID)
+
+		// Populate the workspace with personnel records
+		// Note: There might be discrepancies in the data required for workspace and what's available in hiringData
+		// For instance, 'description' and 'prompt' fields are assumed to be the role's TopLevelRequirement and the first Responsibility's Description respectively
+		workspace.AddPersonnel(assistantID, role.Pseudonym, description, agentPromptBuilder.ToString())
+
+		fmt.Printf("Assistant created and added to workspace: %s (ID: %s)\n", role.Title, assistantID)
 	}
 }
