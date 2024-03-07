@@ -1,0 +1,20 @@
+The following is documentation of how presentation of recommended hires should be organized.
+
+{
+    "hiring_employee_id": {your employee id},
+    "roles": [
+        {
+            "title": {title of first recommendation},
+            "tmp_id": {localized id for this recommendation document with prefix tmp_id_}
+            "top_level_requirement": {the axis upon which success is determined},
+            "reports_to": [{employee id or tmp_id}...],
+            "responsibilities": [
+                {
+                    "description": {description of responsibility}
+                },
+                ...
+            ]
+        },
+        ...
+    ]
+}

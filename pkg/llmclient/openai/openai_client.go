@@ -40,7 +40,7 @@ func (c *OpenAIClient) SendMessageToAssistantOnNewThread(assistantID string, mes
 			Messages: []openai.ThreadMessage{
 				{
 					Role:    "user",
-					Content: "I'm starting a project to design a car, consider this project has started and start tracking work.",
+					Content: message,
 				},
 			},
 		})

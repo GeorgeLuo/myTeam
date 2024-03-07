@@ -2,8 +2,9 @@ package main
 
 import (
 	"fmt"
+	"myTeam/pkg/messagebuilder"
+	"myTeam/pkg/partials"
 	"myTeam/pkg/promptbuilder"
-	"myTeam/pkg/promptbuilder/partials"
 
 	"myTeam/pkg/llmclient/openai"
 )
@@ -39,9 +40,10 @@ func main() {
 
 	fmt.Printf("assistant id: %v\n", assistantID)
 
-	message := "I'm starting a project to design a car, consider this project has started and start tracking work."
-
-	threadID, runID, err := client.SendMessageToAssistantOnNewThread(assistantID, message)
+	mbuilder := &messagebuilder.MessageBuilderImpl{}
+	mbuilder.SetSender("Employee 0")
+	mbuilder.AppendToMessage("I'm starting a project to build an OpenGL visualizer for system processes. Consider this project to be in our portfolio and let's get started.")
+	threadID, runID, err := client.SendMessageToAssistantOnNewThread(assistantID, mbuilder.ToString())
 	if err != nil {
 		fmt.Printf("SendMessageToAssistantOnNewThread error: %v\n", err)
 		return
@@ -56,9 +58,13 @@ func main() {
 	}
 	fmt.Printf("message: %v\n", response)
 
-	message = "These hires make sense, formalize this list in json format."
+	approvalmbuilder := &messagebuilder.MessageBuilderImpl{}
+	approvalmbuilder.SetSender("Employee 0")
+	approvalmbuilder.AppendToMessage("These hires make sense.")
+	approvalmbuilder.SetResponseParameters("use the provided documentation to define your response.")
+	approvalmbuilder.IncludeTextFromFile("resources/prompt/components/documentation/hiring_api.txt")
 
-	runID, err = client.SendMessageToAssistant(assistantID, threadID, message)
+	runID, err = client.SendMessageToAssistant(assistantID, threadID, approvalmbuilder.ToString())
 	if err != nil {
 		fmt.Printf("SendMessageToAssistant error: %v\n", err)
 		return
