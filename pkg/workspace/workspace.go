@@ -8,9 +8,11 @@ import (
 
 // PersonnelMetadata holds the metadata for an employee.
 type PersonnelMetadata struct {
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	Prompt      string `json:"prompt"`
+	Name          string            `json:"name"`
+	Description   string            `json:"description"`
+	Prompt        string            `json:"prompt"`
+	ModelVendor   string            `json:"model_vendor"`
+	ModelMetadata map[string]string `json:"model_metadata"`
 }
 
 // Workspace represents a workspace containing personnel information.
@@ -34,12 +36,15 @@ func NewWorkspace(directory string) Workspace {
 }
 
 // AddPersonnel adds a new employee's metadata to the workspace and updates the JSON file.
-func (w *Workspace) AddPersonnel(id string, name string, description string, prompt string) {
+func (w *Workspace) AddPersonnel(id string, name string, description string, prompt string,
+	vendor string, modelMetadata map[string]string) {
 	// Create the PersonnelMetadata for the employee.
 	employee := PersonnelMetadata{
-		Name:        name,
-		Description: description,
-		Prompt:      prompt,
+		Name:          name,
+		Description:   description,
+		Prompt:        prompt,
+		ModelVendor:   vendor,
+		ModelMetadata: modelMetadata,
 	}
 
 	// Add or update the employee in the map using the provided id.

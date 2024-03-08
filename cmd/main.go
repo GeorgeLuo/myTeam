@@ -44,7 +44,7 @@ func main() {
 	}
 
 	fmt.Printf("assistant id: %v\n", assistantID)
-	workspace.AddPersonnel(assistantID, name, description, prompt)
+	workspace.AddPersonnel(fmt.Sprint(IDIndex), name, description, prompt, "openAI", map[string]string{"assistant_id": assistantID})
 
 	messageBuilder := &messagebuilder.MessageBuilderImpl{}
 	messageBuilder.SetSender("Employee 0")
@@ -124,8 +124,7 @@ func main() {
 		// Populate the workspace with personnel records
 		// Note: There might be discrepancies in the data required for workspace and what's available in hiringData
 		// For instance, 'description' and 'prompt' fields are assumed to be the role's TopLevelRequirement and the first Responsibility's Description respectively
-		workspace.AddPersonnel(assistantID, role.Pseudonym, description, agentPromptBuilder.ToString())
-
+		workspace.AddPersonnel(fmt.Sprint(IDIndex), role.Pseudonym, description, agentPromptBuilder.ToString(), "openAI", map[string]string{"assistant_id": assistantID})
 		fmt.Printf("Assistant created and added to workspace: %s (ID: %s)\n", role.Title, assistantID)
 	}
 }
