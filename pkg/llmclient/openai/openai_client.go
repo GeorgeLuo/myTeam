@@ -34,7 +34,7 @@ func (c *OpenAIClient) CreateAssistant(name string, description string, prompt s
 	return assistant.ID, err
 }
 
-func (c *OpenAIClient) SendMessageToAssistantOnNewThread(assistantID string, message string) (threadID string, runId string, err error) {
+func (c *OpenAIClient) SendMessageToAssistantOnNewThread(assistantID string, message string) (threadID string, runID string, err error) {
 	thread, err := c.client.CreateThread(context.Background(),
 		openai.ThreadRequest{
 			Messages: []openai.ThreadMessage{
@@ -49,7 +49,7 @@ func (c *OpenAIClient) SendMessageToAssistantOnNewThread(assistantID string, mes
 		return
 	}
 
-	runID, err := c.triggerRun(assistantID, thread.ID)
+	runID, err = c.triggerRun(assistantID, thread.ID)
 	if err != nil {
 		fmt.Printf("CreateThread error: %v\n", err)
 		return
@@ -81,6 +81,18 @@ func (c *OpenAIClient) SendMessageToAssistant(assistantID string, threadID strin
 		return
 	}
 	return c.triggerRun(assistantID, threadID)
+}
+
+func (c *OpenAIClient) SendMessage(recipientMetadata map[string]string, message string) (threadID string, runID string, err error) {
+
+	assistant_id := recipientMetadata["assistant_id"]
+	threadID = recipientMetadata["thread_id"]
+
+	if threadID == "" {
+		return c.SendMessageToAssistantOnNewThread(assistant_id, message)
+	}
+	runID, err = c.SendMessageToAssistant(assistant_id, threadID, message)
+	return
 }
 
 func (c *OpenAIClient) GetResponse(threadID string, runID string, limit int) (message string, err error) {

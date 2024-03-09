@@ -2,6 +2,7 @@ package workspace
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	"path/filepath"
 )
@@ -50,6 +51,31 @@ func (w *Workspace) AddPersonnel(id string, name string, description string, pro
 	// Add or update the employee in the map using the provided id.
 	w.Personnel[id] = employee
 	w.save()
+}
+
+// SetModelMetaDataByID updates or adds a new metadata key-value pair for a specific personnel by ID.
+func (w *Workspace) SetModelMetaDataByID(id string, key string, value string) error {
+	// Check if the personnel with the given ID exists
+	personnel, exists := w.Personnel[id]
+	if !exists {
+		return fmt.Errorf("personnel with ID %s does not exist", id)
+	}
+	// Initialize the map if it's nil
+	if personnel.ModelMetadata == nil {
+		personnel.ModelMetadata = make(map[string]string)
+	}
+	// Set the key-value pair in model_metadata
+	personnel.ModelMetadata[key] = value
+	// Update the map entry
+	w.Personnel[id] = personnel
+	// Save changes
+	w.save()
+	return nil
+}
+
+// File returns the workspace as a file
+func (w *Workspace) File() string {
+	return filepath.Join(w.Directory, "workspace.json")
 }
 
 // save writes the current state of Workspace to a JSON file in the specified Directory.

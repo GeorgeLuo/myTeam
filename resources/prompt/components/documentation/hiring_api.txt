@@ -9,7 +9,7 @@ The following is documentation of how presentation of recommended hires should b
             "tmp_id": {localized id for this recommendation document with prefix tmp_id_},
             "pseudonym": {a codename-like id which is semi-random as to be unique within an organization},
             "top_level_requirement": {the axis upon which success is determined},
-            "reports_to": [{employee id or tmp_id}...],
+            "reports_to": [{employee id or tmp_id as string value}...],
             "responsibilities": [
                 {
                     "description": {description of responsibility}

@@ -9,12 +9,24 @@ import (
 
 	"myTeam/pkg/llmclient/openai"
 	"myTeam/pkg/workspace"
+
+	"myTeam/pkg/courier"
 )
 
 func main() {
 
+	authToken := ""
+
+	// interfacing element with LLM to create personnel
+	llmClient := openai.NewOpenAIClient(authToken)
+
+	// workplace tracker
+	workspace := workspace.NewWorkspace("default_database")
+
+	// counter for generating ids
 	IDIndex := 1
 
+	// build the prompt to generate agent 1
 	agentPromptBuilder := &promptbuilder.AgentPromptBuilderImpl{}
 
 	agentPromptBuilder.SetTopLevelRequirement("You will assist employee 0 in accomplishing his goals as he determines them.")
@@ -32,11 +44,7 @@ func main() {
 	description := "A close assistant"
 	name := "Corbin"
 
-	authToken := ""
-
-	llmClient := openai.NewOpenAIClient(authToken)
-	workspace := workspace.NewWorkspace("default_database")
-
+	// create personnel
 	assistantID, err := llmClient.CreateAssistant(name, description, prompt)
 	if err != nil {
 		fmt.Printf("CreateAssistant error: %v\n", err)
@@ -44,8 +52,11 @@ func main() {
 	}
 
 	fmt.Printf("assistant id: %v\n", assistantID)
+
+	// add to workspace
 	workspace.AddPersonnel(fmt.Sprint(IDIndex), name, description, prompt, "openAI", map[string]string{"assistant_id": assistantID})
 
+	// initial message to begin project
 	messageBuilder := &messagebuilder.MessageBuilderImpl{}
 	messageBuilder.SetSender("Employee 0")
 	messageBuilder.AppendToMessage("I'm starting a project to build an OpenGL visualizer for system processes. Consider this project to be in our portfolio and let's get started.")
@@ -57,6 +68,11 @@ func main() {
 	}
 
 	fmt.Printf("thread id: %v, run id: %v\n", threadID, runID)
+
+	if err := workspace.SetModelMetaDataByID(fmt.Sprint(IDIndex), "thread_id", threadID); err != nil {
+		fmt.Println("Failed to set model metadata:", err)
+		return
+	}
 
 	response, err := llmClient.GetResponse(threadID, runID, 1)
 	if err != nil {
@@ -92,6 +108,7 @@ func main() {
 		return
 	}
 
+	// initialize suggested roles
 	for _, role := range hiringData.Roles {
 
 		agentPromptBuilder := &promptbuilder.AgentPromptBuilderImpl{}
@@ -121,10 +138,44 @@ func main() {
 
 		fmt.Printf("assistant id: %v\n", assistantID)
 
-		// Populate the workspace with personnel records
-		// Note: There might be discrepancies in the data required for workspace and what's available in hiringData
-		// For instance, 'description' and 'prompt' fields are assumed to be the role's TopLevelRequirement and the first Responsibility's Description respectively
 		workspace.AddPersonnel(fmt.Sprint(IDIndex), role.Pseudonym, description, agentPromptBuilder.ToString(), "openAI", map[string]string{"assistant_id": assistantID})
 		fmt.Printf("Assistant created and added to workspace: %s (ID: %s)\n", role.Title, assistantID)
 	}
+
+	confirmbuilder := &messagebuilder.MessageBuilderImpl{}
+	confirmbuilder.SetSender("Employee 0")
+	confirmbuilder.AppendToMessage("Thank you, I have made the hires and they are documented in our workspace database. I've attached the records.")
+	confirmbuilder.AppendToMessage("now that we have more complex communication possibilites, we will be using a courier system as documented in the attached document")
+	confirmbuilder.AppendToMessage("think about the next steps in accomplishing our project, and when the courier makes contact, convey the messages to relevant parties")
+	confirmbuilder.SetResponseParameters("confirm you understand the documentation.")
+	confirmbuilder.IncludeTextFromFile("resources/prompt/components/documentation/courier_api.txt")
+	confirmbuilder.IncludeTextFromFile(workspace.File())
+
+	runID, err = llmClient.SendMessageToAssistant(assistantID, threadID, confirmbuilder.ToString())
+	if err != nil {
+		fmt.Printf("SendMessageToAssistant error: %v\n", err)
+		return
+	}
+
+	response, err = llmClient.GetResponse(threadID, runID, 1)
+	if err != nil {
+		fmt.Printf("GetResponse error: %v\n", err)
+		return
+	}
+	fmt.Printf("message: %v\n", response)
+
+	courier := courier.NewCourier("1", &workspace, &llmClient)
+	courier.AddMessage("0", "I'm checking in to test the courier system, did you get this?")
+	threadID, runID, err = courier.Dispatch()
+	if err != nil {
+		fmt.Printf("Dispatch error: %v\n", err)
+		return
+	}
+	fmt.Printf("courier dispatched on thread: %s with runID: %s\n", threadID, runID)
+	response, err = llmClient.GetResponse(threadID, runID, 1)
+	if err != nil {
+		fmt.Printf("GetResponse error: %v\n", err)
+		return
+	}
+	fmt.Printf("message: %v\n", response)
 }
