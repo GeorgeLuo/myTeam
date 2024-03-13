@@ -3,17 +3,19 @@ package workspace
 import (
 	"encoding/json"
 	"fmt"
+	"myTeam/pkg/promptbuilder"
 	"os"
 	"path/filepath"
 )
 
 // PersonnelMetadata holds the metadata for an employee.
 type PersonnelMetadata struct {
-	Name          string            `json:"name"`
-	Description   string            `json:"description"`
-	Prompt        string            `json:"prompt"`
-	ModelVendor   string            `json:"model_vendor"`
-	ModelMetadata map[string]string `json:"model_metadata"`
+	Name          string              `json:"name"`
+	Description   string              `json:"description"`
+	Prompt        string              `json:"prompt"`
+	PromptOutline map[string][]string `json:"prompt_outline"`
+	ModelVendor   string              `json:"model_vendor"`
+	ModelMetadata map[string]string   `json:"model_metadata"`
 }
 
 // Workspace represents a workspace containing personnel information.
@@ -37,13 +39,20 @@ func NewWorkspace(directory string) Workspace {
 }
 
 // AddPersonnel adds a new employee's metadata to the workspace and updates the JSON file.
-func (w *Workspace) AddPersonnel(id string, name string, description string, prompt string,
+func (w *Workspace) AddPersonnel(id string, name string, description string, prompt promptbuilder.AgentPromptBuilder,
 	vendor string, modelMetadata map[string]string) {
-	// Create the PersonnelMetadata for the employee.
+
+	promptFilename := fmt.Sprintf("%s-%s-prompt.txt", id, name)
+	promptPath := filepath.Join(w.Directory, promptFilename)
+	if err := os.WriteFile(promptPath, []byte(prompt.ToString()), 0644); err != nil {
+		panic("Failed to write prompt file: " + err.Error())
+	}
+
 	employee := PersonnelMetadata{
 		Name:          name,
 		Description:   description,
-		Prompt:        prompt,
+		Prompt:        promptFilename,
+		PromptOutline: prompt.GetOutline(),
 		ModelVendor:   vendor,
 		ModelMetadata: modelMetadata,
 	}
@@ -116,4 +125,18 @@ func (w *Workspace) load() {
 	if err := json.Unmarshal(data, w); err != nil {
 		panic("Failed to unmarshal workspace data: " + err.Error())
 	}
+}
+
+// LoadFromFile creates a Workspace instance from a JSON file.
+func LoadFromFile(filename string) (Workspace, error) {
+	var workspace Workspace
+	data, err := os.ReadFile(filename)
+	if err != nil {
+		return workspace, fmt.Errorf("failed to read file: %w", err)
+	}
+	if err := json.Unmarshal(data, &workspace); err != nil {
+		return workspace, fmt.Errorf("failed to unmarshal workspace: %w", err)
+	}
+	workspace.Directory = filepath.Dir(filename)
+	return workspace, nil
 }

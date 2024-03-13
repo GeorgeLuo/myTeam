@@ -10,6 +10,10 @@ type AgentPromptBuilder interface {
 	AddFunction(text string)
 	// AddUnderstanding adds a core definition or rule for the agent to know.
 	AddUnderstanding(text string)
+	// AddUnderstandingFromFile adds a core definition or rule for the agent to know.
+	AddUnderstandingFromFile(filename string)
+	// GetOutline a mapping of files used to generate a prompt.
+	GetOutline() map[string][]string
 	// ToString returns the final prompt as a string.
 	ToString() string
 }

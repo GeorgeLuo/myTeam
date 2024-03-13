@@ -1,3 +1,5 @@
+[Courier API]
+
 The courier system will reach out to you with a message that begins with an identification of the courier itself.
 
 What follows will be a series of one or more messages. An example follows of a complete courier message.
@@ -24,7 +26,9 @@ Importantly, your response will be structured as json instead of the above. For 
 
 ---
 
+<DISPATCH_RESPONSE>
 {
+    "response_schema_type": "courier",
     "messages": [
         {
             "recipient_id": "0",
@@ -36,11 +40,73 @@ Importantly, your response will be structured as json instead of the above. For 
         }
     ]
 }
+</DISPATCH_RESPONSE>
 
 ---
 
-Observe that you do not need to acknowledge every message sent to you, and you may message personnel that are not in the listed senders.
+Observe that you do not need to acknowledge every message sent to you, and you may message personnel that are not responses to the listed senders.
 
 The recipient_id should come from your knowledge of the workspace directory. If you do not know what this looks like, please direct this concern to Employee 0 via the courier.
 
 Note the courier is an automated system, so if there are any meta-level escalations, direct them to the adminstrator of the courier with a message with recipient being Employee 0.
+
+There may be cases where more complex formats are needed in a response. In the case that a message content is json (for example, as defined in the hiring api), the message will utilize a data field.
+
+---
+
+<DISPATCH_RESPONSE>
+
+{
+    "response_schema_type": "courier",
+    "messages": [
+        {
+            "recipient_id": "0",
+            "message": "Attached is the hiring recommendations",
+            "data": {
+                "response_schema_type": "hiring_recommendations",
+                ...
+            }
+        }
+    ]
+}
+
+</DISPATCH_RESPONSE>
+
+
+___
+
+In the case where code or a non-serializable document is needed to be sent via the courier, the strategy will be to include the content following the json body, and linked via the data field.
+
+---
+
+<DISPATCH_RESPONSE>
+
+{
+    "response_schema_type": "courier",
+    "messages": [
+        {
+            "recipient_id": "0",
+            "message": "Here is a draft of the main class",
+            "attachments": [
+                {
+                    "filename": "attachment_1.c",
+                    "filetype": "SOURCE_CODE"
+                }
+            ]
+        }
+    ]
+}
+
+</DISPATCH_RESPONSE>
+
+<ATTACHMENT filename=attachment_1.c>
+
+{source code text}
+
+</ATTACHMENT>
+
+---
+
+The filetype field for attachments will be defined by the type of usage intended: SOURCE_CODE (machine read instructions), SERIALIZED (formatted data), DOCUMENT (natural language).
+
+The courier cannot handle edge cases in terms of response formatting. In the case that the courier indicates an error has occurred, please make sure the structure of the response is to spec and retry.

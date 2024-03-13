@@ -1,3 +1,5 @@
+[Hiring API]
+
 The following is documentation of how presentation of recommended hires should be organized.
 
 {

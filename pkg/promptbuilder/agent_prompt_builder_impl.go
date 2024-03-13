@@ -1,6 +1,9 @@
 package promptbuilder
 
-import "strings"
+import (
+	"myTeam/pkg/partials"
+	"strings"
+)
 
 type AgentPromptBuilderImpl struct {
 	topLevelRequirement string
@@ -23,6 +26,17 @@ func (a *AgentPromptBuilderImpl) AddFunction(text string) {
 
 func (a *AgentPromptBuilderImpl) AddUnderstanding(text string) {
 	a.understandings = append(a.understandings, text)
+}
+
+func (a *AgentPromptBuilderImpl) AddUnderstandingFromFile(filename string) {
+	a.understandings = append(a.understandings, partials.LoadFromFile(filename))
+}
+
+func (a *AgentPromptBuilderImpl) GetOutline() map[string][]string {
+	outline := make(map[string][]string)
+	outline["topLevelRequirement"] = []string{a.topLevelRequirement}
+	outline["orgMetadata"] = a.orgMetadata
+	return outline
 }
 
 func (a *AgentPromptBuilderImpl) ToString() string {
