@@ -8,7 +8,6 @@ import (
 	"strings"
 )
 
-// Courier struct defined with necessary fields
 type Courier struct {
 	recipientID         string
 	messages            map[string]string
@@ -18,7 +17,6 @@ type Courier struct {
 	responseAttachments map[string]string
 }
 
-// NewCourier is a constructor function for Courier
 func NewCourier(recipientID string, ws *workspace.Workspace, client llmclient.LLMClient) *Courier {
 	return &Courier{
 		recipientID:         recipientID,
@@ -34,13 +32,11 @@ func (c *Courier) AddMessage(sender string, message string) {
 	c.messages[sender] = message
 }
 
-// Dispatch method which sends a message to the specified employee
 func (c *Courier) Dispatch() (threadID string, runID string, err error) {
-	// Retrieve metadata from workspace for employee
 	metadata, exists := c.workspace.Personnel[c.recipientID]
 	if !exists {
 		fmt.Println("Recipient not found in workspace")
-		return
+		return threadID, runID, fmt.Errorf("recipient %v not found in workspace", c.recipientID)
 	}
 
 	completeMessage := "This is the Courier\n\n"
@@ -59,51 +55,53 @@ func (c *Courier) DispatchAndWait() (response DispatchResponse, attachments map[
 	threadID, runID, err := c.Dispatch()
 	if err != nil {
 		fmt.Printf("Dispatch error: %v\n", err)
-		return
-	}
-	// fmt.Printf("courier dispatched on thread: %s with runID: %s\n", threadID, runID)
-
-	if err := c.workspace.SetModelMetaDataByID(fmt.Sprint(c.recipientID), "thread_id", threadID); err != nil {
-		fmt.Println("Failed to set model metadata:", err)
+		return response, attachments, err
 	}
 
 	rawResponse, err := c.llmClient.GetResponse(threadID, runID, 1)
 	if err != nil {
 		fmt.Printf("GetResponse error: %v\n", err)
-		return
+		return response, attachments, err
 	}
-	// Extract JSON part
+
 	jsonStart := strings.Index(rawResponse, "<DISPATCH_RESPONSE>") + len("<DISPATCH_RESPONSE>")
 	jsonEnd := strings.Index(rawResponse, "</DISPATCH_RESPONSE>")
 	if jsonEnd > jsonStart && jsonStart > len("<DISPATCH_RESPONSE>")-1 {
 		jsonPart := rawResponse[jsonStart:jsonEnd]
 		if err = json.Unmarshal([]byte(jsonPart), &response); err != nil {
 			fmt.Println("Error unmarshaling JSON response:", err)
-			return
+			return response, attachments, err
 		}
 	} else {
 		fmt.Println("Invalid response format")
-		return
+		return response, attachments, fmt.Errorf("invalid response format")
 	}
-	// Initialize attachments map
+
 	attachments = make(map[string]string)
-	// Extract attachments
-	attachmentStart := jsonEnd + len("</DISPATCH_RESPONSE>")
-	attachmentSection := rawResponse[attachmentStart:]
-	if strings.Contains(attachmentSection, "<ATTACHMENT") {
-		// Assuming only one attachment for simplicity. Multiple attachments handling might require a loop.
-		filenameStart := strings.Index(attachmentSection, "filename=") + len("filename=") - 1
-		filenameEnd := strings.Index(attachmentSection[filenameStart:], ">") + filenameStart + 1
-		filename := attachmentSection[filenameStart:filenameEnd]
-		filename = filename[1 : len(filename)-1] // Remove surrounding quotes
-		attachmentContentStart := filenameEnd + 1
-		attachmentContentEnd := strings.Index(attachmentSection, "</ATTACHMENT>")
-		attachmentContent := attachmentSection[attachmentContentStart:attachmentContentEnd]
-		attachments[filename] = attachmentContent
+
+	attachmentSections := strings.Split(rawResponse[jsonEnd:], "<ATTACHMENT")
+	for _, section := range attachmentSections {
+		if trimmed := strings.TrimSpace(section); trimmed != "" {
+			attachmentRaw := "<ATTACHMENT" + section
+			filenameStart := strings.Index(attachmentRaw, "filename=") + len("filename=")
+			if filenameStart >= len("filename=") {
+				filenameEnd := strings.Index(attachmentRaw[filenameStart:], ">") + filenameStart
+				if filenameEnd > filenameStart {
+					filename := strings.Trim(attachmentRaw[filenameStart:filenameEnd], "\"")
+					contentStart := filenameEnd + 1
+					contentEnd := strings.Index(attachmentRaw, "</ATTACHMENT>")
+					if contentEnd > contentStart {
+						content := attachmentRaw[contentStart:contentEnd]
+						attachments[filename] = content
+					}
+				}
+			}
+		}
 	}
+
 	c.responseAttachments = attachments
 	c.dispatchResponse = response
-	return
+	return response, attachments, nil
 }
 
 func (c *Courier) GetMessagesByRecipient(recipientID string) (attachments map[string]string, messages []Message) {
@@ -112,7 +110,9 @@ func (c *Courier) GetMessagesByRecipient(recipientID string) (attachments map[st
 		if msg.RecipientID == recipientID {
 			messages = append(messages, msg)
 			for _, attachment := range msg.Attachments {
-				attachments[attachment.Filename] = c.responseAttachments[attachment.Filename]
+				if attachmentContent, ok := c.responseAttachments[attachment.Filename]; ok {
+					attachments[attachment.Filename] = attachmentContent
+				}
 			}
 		}
 	}

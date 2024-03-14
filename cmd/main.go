@@ -86,20 +86,32 @@ func main() {
 			for _, message := range messages {
 				fmt.Printf("%+v\n", message.Message)
 				if len(attachments) > 0 {
-					fmt.Printf("*** SYSTEM ***\nfound %d attachment(s), reply with attachment name to display the file\n", len(attachments))
-					for _, attachment := range message.Attachments {
-						fmt.Printf("%s\n", attachment.Filename)
-					}
-					fmt.Println("*** SYSTEM ***")
-					scanned := scanner.Scan()
-					if !scanned {
-						if err := scanner.Err(); err != nil {
-							fmt.Printf("Error reading from input: %v\n", err)
+
+					reviewingAttachments := true
+
+					for reviewingAttachments {
+						fmt.Printf("*** SYSTEM ***\nfound %d attachment(s)\n", len(attachments))
+						for _, attachment := range message.Attachments {
+							fmt.Printf("%s\n", attachment.Filename)
 						}
-						break
+						fmt.Println("*** SYSTEM ***")
+						scanned := scanner.Scan()
+						if !scanned {
+							if err := scanner.Err(); err != nil {
+								fmt.Printf("Error reading from input: %v\n", err)
+							}
+							break
+						}
+						input := scanner.Text()
+
+						// Check if the user pressed <ENTER> to exit attachment review
+						if input == "" {
+							fmt.Println("Exiting attachment review...")
+							break
+						}
+
+						fmt.Printf("%s", attachments[input])
 					}
-					input := scanner.Text()
-					fmt.Printf("%s", attachments[input])
 				}
 			}
 		}
