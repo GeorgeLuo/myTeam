@@ -10,18 +10,19 @@ import (
 
 // PersonnelMetadata holds the metadata for an employee.
 type PersonnelMetadata struct {
-	Name          string              `json:"name"`
-	Description   string              `json:"description"`
-	Prompt        string              `json:"prompt"`
-	PromptOutline map[string][]string `json:"prompt_outline"`
-	ModelVendor   string              `json:"model_vendor"`
-	ModelMetadata map[string]string   `json:"model_metadata"`
+	Name          string                      `json:"name"`
+	Description   string                      `json:"description"`
+	Prompt        string                      `json:"prompt"`
+	PromptOutline promptbuilder.PromptOutline `json:"prompt_outline"`
+	ModelVendor   string                      `json:"model_vendor"`
+	ModelMetadata map[string]string           `json:"model_metadata"`
 }
 
 // Workspace represents a workspace containing personnel information.
 type Workspace struct {
 	Personnel map[string]PersonnelMetadata `json:"personnel"`
 	Directory string                       `json:"-"`
+	idCount   int                          `json:"-"`
 }
 
 // NewWorkspace creates a new Workspace instance and attempts to load personnel data from the specified directory.
@@ -29,6 +30,7 @@ func NewWorkspace(directory string) Workspace {
 	workspace := Workspace{
 		Personnel: make(map[string]PersonnelMetadata),
 		Directory: directory,
+		idCount:   1,
 	}
 	// Ensure the directory exists
 	if err := os.MkdirAll(directory, 0755); err != nil {
@@ -59,6 +61,11 @@ func (w *Workspace) AddPersonnel(id string, name string, description string, pro
 
 	// Add or update the employee in the map using the provided id.
 	w.Personnel[id] = employee
+
+	if id == fmt.Sprint(w.GetNextAssignableID()) {
+		w.idCount++
+	}
+
 	w.save()
 }
 
@@ -102,6 +109,10 @@ func (w *Workspace) save() {
 	if err := os.WriteFile(filePath, data, 0644); err != nil {
 		panic("Failed to write workspace file: " + err.Error())
 	}
+}
+
+func (w *Workspace) GetNextAssignableID() (ID string) {
+	return fmt.Sprint(w.idCount)
 }
 
 // load attempts to load personnel data from a JSON file in the specified Directory.

@@ -5,7 +5,7 @@ type AgentPromptBuilder interface {
 	// SetTopLevelRequirement sets the top-level requirement for the agent.
 	SetTopLevelRequirement(text string)
 	// AddOrgMetadata adds a factor of localized organization structure.
-	AddOrgMetadata(text string)
+	AddOrgMetadata(key string, value string)
 	// AddFunction adds a specific function responsibility of the agent.
 	AddFunction(text string)
 	// AddUnderstanding adds a core definition or rule for the agent to know.
@@ -13,7 +13,7 @@ type AgentPromptBuilder interface {
 	// AddUnderstandingFromFile adds a core definition or rule for the agent to know.
 	AddUnderstandingFromFile(filename string)
 	// GetOutline a mapping of files used to generate a prompt.
-	GetOutline() map[string][]string
+	GetOutline() PromptOutline
 	// ToString returns the final prompt as a string.
 	ToString() string
 }
