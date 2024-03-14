@@ -106,12 +106,13 @@ func (c *Courier) DispatchAndWait() (response DispatchResponse, attachments map[
 	return
 }
 
-func (c *Courier) GetMessagesByRecipient(recipientID string) (attachments []string, messages []Message) {
+func (c *Courier) GetMessagesByRecipient(recipientID string) (attachments map[string]string, messages []Message) {
+	attachments = make(map[string]string)
 	for _, msg := range c.dispatchResponse.Messages {
 		if msg.RecipientID == recipientID {
 			messages = append(messages, msg)
 			for _, attachment := range msg.Attachments {
-				attachments = append(attachments, c.responseAttachments[attachment.Filename])
+				attachments[attachment.Filename] = c.responseAttachments[attachment.Filename]
 			}
 		}
 	}

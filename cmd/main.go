@@ -82,9 +82,25 @@ func main() {
 				continue
 			}
 
-			_, messages := courier.GetMessagesByRecipient(*senderID)
+			attachments, messages := courier.GetMessagesByRecipient(*senderID)
 			for _, message := range messages {
 				fmt.Printf("%+v\n", message.Message)
+				if len(attachments) > 0 {
+					fmt.Printf("*** SYSTEM ***\nfound %d attachment(s), reply with attachment name to display the file\n", len(attachments))
+					for _, attachment := range message.Attachments {
+						fmt.Printf("%s\n", attachment.Filename)
+					}
+					fmt.Println("*** SYSTEM ***")
+					scanned := scanner.Scan()
+					if !scanned {
+						if err := scanner.Err(); err != nil {
+							fmt.Printf("Error reading from input: %v\n", err)
+						}
+						break
+					}
+					input := scanner.Text()
+					fmt.Printf("%s", attachments[input])
+				}
 			}
 		}
 
