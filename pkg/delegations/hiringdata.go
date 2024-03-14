@@ -3,7 +3,7 @@ package delegations
 import (
 	"encoding/json"
 	"fmt"
-	"strings"
+	"myTeam/pkg/utils"
 )
 
 // HiringData represents the top-level structure of the hiring information.
@@ -31,10 +31,7 @@ type Responsibility struct {
 func UnmarshalHiringData(data []byte) (HiringData, error) {
 	var hiringData HiringData
 	strData := string(data)
-	if strings.HasPrefix(strData, "```json") && strings.HasSuffix(strData, "```") {
-		strData = strData[7 : len(strData)-3] // Removes starting ```json and ending ```
-		strData = strings.TrimSpace(strData)
-	}
+	strData = utils.CleanResponse(strData)
 	fmt.Println("Cleaned JSON string:", strData)
 	err := json.Unmarshal([]byte(strData), &hiringData)
 	if err != nil {

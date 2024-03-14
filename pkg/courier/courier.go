@@ -61,7 +61,7 @@ func (c *Courier) DispatchAndWait() (response DispatchResponse, attachments map[
 		fmt.Printf("Dispatch error: %v\n", err)
 		return
 	}
-	fmt.Printf("courier dispatched on thread: %s with runID: %s\n", threadID, runID)
+	// fmt.Printf("courier dispatched on thread: %s with runID: %s\n", threadID, runID)
 
 	if err := c.workspace.SetModelMetaDataByID(fmt.Sprint(c.recipientID), "thread_id", threadID); err != nil {
 		fmt.Println("Failed to set model metadata:", err)
