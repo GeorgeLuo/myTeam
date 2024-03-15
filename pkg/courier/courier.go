@@ -58,6 +58,11 @@ func (c *Courier) DispatchAndWait() (response DispatchResponse, attachments map[
 		return response, attachments, err
 	}
 
+	if err = c.workspace.SetModelMetaDataByID(fmt.Sprint(c.recipientID), "thread_id", threadID); err != nil {
+		fmt.Println("Failed to set model metadata:", err)
+		return
+	}
+
 	rawResponse, err := c.llmClient.GetResponse(threadID, runID, 1)
 	if err != nil {
 		fmt.Printf("GetResponse error: %v\n", err)

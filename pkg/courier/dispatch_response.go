@@ -7,10 +7,11 @@ type DispatchResponse struct {
 }
 
 type Message struct {
-	RecipientID string          `json:"recipient_id"`
-	Message     string          `json:"message"`
-	Data        json.RawMessage `json:"data"`
-	Attachments []Attachment    `json:"attachments"`
+	RecipientID    string          `json:"recipient_id"`
+	Message        string          `json:"message"`
+	DataSchemaType string          `json:"data_schema_type"`
+	Data           json.RawMessage `json:"data"`
+	Attachments    []Attachment    `json:"attachments"`
 }
 
 type Attachment struct {

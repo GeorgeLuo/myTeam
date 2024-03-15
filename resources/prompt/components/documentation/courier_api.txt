@@ -50,7 +50,9 @@ The recipient_id should come from your knowledge of the workspace directory. If 
 
 Note the courier is an automated system, so if there are any meta-level escalations, direct them to the adminstrator of the courier with a message with recipient being Employee 0.
 
-There may be cases where more complex formats are needed in a response. In the case that a message content is json (for example, as defined in the hiring api), the message will utilize a data field.
+There may be cases where more complex formats are needed in a response. In the case that a message content is json (for example, as defined in the hiring api), the message will utilize a data field with a data_schema_type, that should be taken from the specific documentations.
+
+To be clear, you should always format responses according to the courier api, as further processing always assumes what's documented. You should never respond to the courier in a format not according to this pattern.  
 
 ---
 
@@ -62,8 +64,8 @@ There may be cases where more complex formats are needed in a response. In the c
         {
             "recipient_id": "0",
             "message": "Attached is the hiring recommendations",
+            "data_schema_type": "HIRING_RECOMMENDATIONS",
             "data": {
-                "response_schema_type": "hiring_recommendations",
                 ...
             }
         }

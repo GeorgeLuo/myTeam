@@ -6,6 +6,7 @@ import (
 	"myTeam/pkg/promptbuilder"
 	"os"
 	"path/filepath"
+	"strconv"
 )
 
 // PersonnelMetadata holds the metadata for an employee.
@@ -149,5 +150,16 @@ func LoadFromFile(filename string) (Workspace, error) {
 		return workspace, fmt.Errorf("failed to unmarshal workspace: %w", err)
 	}
 	workspace.Directory = filepath.Dir(filename)
+
+	// Calculate the highest numerical ID in the personnel map
+	highestID := 0
+	for id := range workspace.Personnel {
+		if numericID, err := strconv.Atoi(id); err == nil {
+			if numericID > highestID {
+				highestID = numericID
+			}
+		}
+	}
+	workspace.idCount = highestID + 1
 	return workspace, nil
 }

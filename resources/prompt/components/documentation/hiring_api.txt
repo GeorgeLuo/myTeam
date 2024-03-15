@@ -3,7 +3,7 @@
 The following is documentation of how presentation of recommended hires should be organized.
 
 {
-    "response_schema_type": "hiring_recommendations",
+    "response_schema_type": "HIRING_RECOMMENDATIONS",
     "hiring_employee_id": {your employee id},
     "roles": [
         {

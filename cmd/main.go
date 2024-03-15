@@ -2,9 +2,11 @@ package main
 
 import (
 	"bufio"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"myTeam/pkg/courier"
+	"myTeam/pkg/delegations"
 	"myTeam/pkg/llmclient/openai"
 	"myTeam/pkg/messagebuilder"
 	"myTeam/pkg/promptbuilder"
@@ -111,6 +113,57 @@ func main() {
 						}
 
 						fmt.Printf("%s", attachments[input])
+					}
+				}
+				if message.DataSchemaType == "HIRING_RECOMMENDATIONS" {
+					fmt.Println("*** SYSTEM ***\nfound agent recommendations in message")
+					var hiringData delegations.HiringData
+					err := json.Unmarshal(message.Data, &hiringData)
+					if err != nil {
+						fmt.Printf("Failed to unmarshal hiring recommendations: %v\n", err)
+						continue
+					}
+					hiringDataJSON, _ := json.MarshalIndent(hiringData, "", "  ")
+					fmt.Printf("%s\n\n", hiringDataJSON)
+					fmt.Println("Approve recommendations to workspace? (y/N)")
+					fmt.Println("*** SYSTEM ***")
+
+					reader := bufio.NewReader(os.Stdin)
+					approveResponse, _ := reader.ReadString('\n')
+
+					if strings.TrimSpace(approveResponse) == "y" {
+						for _, role := range hiringData.Roles {
+
+							description := "A direct report to Employee " + fmt.Sprint(hiringData.HiringEmployeeID) + " with title of " + role.Title
+							name := role.Pseudonym
+
+							agentPromptBuilder := promptbuilder.NewAgentPromptBuilderImpl()
+
+							agentPromptBuilder.SetTopLevelRequirement(role.TopLevelRequirement)
+
+							agentPromptBuilder.AddOrgMetadata("ID", ws.GetNextAssignableID())
+							for _, reportsTo := range role.ReportsTo {
+								agentPromptBuilder.AddOrgMetadata("REPORTING_TO", reportsTo)
+							}
+							agentPromptBuilder.AddOrgMetadata("NAME", name)
+
+							agentPromptBuilder.AddUnderstandingFromFile("resources/prompt/components/delegation_capabilities.txt")
+							agentPromptBuilder.AddUnderstandingFromFile("resources/prompt/components/defining_responsibilities.txt")
+							agentPromptBuilder.AddUnderstandingFromFile("resources/prompt/components/defining_communication.txt")
+							agentPromptBuilder.AddUnderstandingFromFile("resources/prompt/components/documentation/courier_api.txt")
+							agentPromptBuilder.AddUnderstandingFromFile("resources/prompt/components/documentation/hiring_api.txt")
+
+							for _, responsibility := range role.Responsibilities {
+								agentPromptBuilder.AddFunction(responsibility.Description)
+							}
+
+							assistantID, err := llmClient.CreateAssistant(name, description, agentPromptBuilder.ToString())
+							if err != nil {
+								fmt.Printf("CreateAssistant error: %v\n", err)
+								return
+							}
+							ws.AddPersonnel(ws.GetNextAssignableID(), name, description, agentPromptBuilder, "openAI", map[string]string{"assistant_id": assistantID})
+						}
 					}
 				}
 			}
