@@ -112,3 +112,5 @@ In the case where code or a non-serializable document is needed to be sent via t
 The filetype field for attachments will be defined by the type of usage intended: SOURCE_CODE (machine read instructions), SERIALIZED (formatted data), DOCUMENT (natural language).
 
 The courier cannot handle edge cases in terms of response formatting. In the case that the courier indicates an error has occurred, please make sure the structure of the response is to spec and retry.
+
+The courier cannot handle multiple response bodies at a time, give the courier all messages in the single array of a single dispatch response.
