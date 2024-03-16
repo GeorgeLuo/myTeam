@@ -1,0 +1,52 @@
+Hiring API Documentation for LLM-to-LLM Hiring
+This Hiring API is designed to facilitate the hiring process within an LLM-managed ecosystem, ensuring compatibility and efficiency in role fulfillment and management. Below is the schema for submitting hiring recommendations, tailored for interactions where both the recommending and recommended agents are LLMs.
+
+{
+  "response_schema_type": "HIRING_RECOMMENDATIONS",
+  "hiring_agent_id": "LLM_HIRING_AGENT_ID",
+  "roles": [
+    {
+      "title": "ROLE_TITLE_FOR_LLM",
+      "tmp_id": "TMP_ID_PREFIX_SPECIFIC_IDENTIFIER",
+      "pseudonym": "UNIQUE_LLM_CODENAME",
+      "top_level_requirement": "CRITERION_FOR_LLM_ROLE_SUCCESS",
+      "skills_required": ["SKILL_1", "SKILL_2"],
+      "knowledge_area": ["AREA_1", "AREA_2"],
+      "limitations": ["LIMITATION_1", "LIMITATION_2"],
+      "reports_to": ["LLM_MANAGER_ID"],
+      "responsibilities": [
+        {
+          "description": "SPECIFIC_LLM_RESPONSIBILITY"
+        }
+      ],
+      "feedback_loop": {
+        "feedback_required": true,
+        "feedback_frequency": "FREQUENCY",
+        "feedback_method": "METHOD"
+      }
+    }
+  ]
+}
+Key Definitions and Instructions for LLM Use:
+
+response_schema_type: Identifies the type of response, always set to "HIRING_RECOMMENDATIONS" for consistency.
+hiring_agent_id: The unique identifier of the LLM making the hiring recommendation.
+roles: An array of roles for which hires are recommended, with each object containing:
+title: The title of the role tailored for an LLM, indicating the nature of the work.
+tmp_id: A temporary identifier for this role, ensuring traceability.
+pseudonym: A unique identifier for internal use, facilitating anonymity and security.
+top_level_requirement: The primary criterion for the role's success, focusing on outcomes.
+skills_required: A list of specific skills necessary for the role.
+knowledge_area: Areas of knowledge essential for the role.
+limitations: Any known limitations of the LLM in relation to the role.
+reports_to: Identifier(s) of the LLM(s) to whom the new hire will report.
+responsibilities: Detailed responsibilities expected to be managed by the LLM in this role.
+feedback_loop: Structured feedback mechanism details, including:
+feedback_required: Indicates if ongoing feedback is necessary.
+feedback_frequency: How often feedback should be provided.
+feedback_method: The method through which feedback is given.
+Instructions for Use:
+
+When creating hiring recommendations, replace placeholders (e.g., LLM_HIRING_AGENT_ID, ROLE_TITLE_FOR_LLM) with actual data. Ensure the definition of each role is clear and aligns with the capabilities and development paths of LLM candidates. The inclusion of feedback loops, skill requirements, and knowledge areas are crucial for ensuring the role's fit and the continuous improvement of the LLM within the role.
+
+This documentation is designed to support a nuanced, LLM-centric hiring process, emphasizing the importance of clear communication, role specificity, and the growth potential within each role.

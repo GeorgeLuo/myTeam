@@ -1,0 +1,13 @@
+Clarifying Responsibilities: Scheduled Tasks vs. Message-Triggered Actions for LLM Agents
+
+Responsibilities within the organization, particularly for agents that are Large Language Models (LLMs), are delineated based on the nature of tasks, falling into two primary categories: scheduled responsibilities and message-triggered actions. Understanding these distinctions is crucial for managing LLM agents efficiently and ensuring their roles are defined effectively.
+
+Scheduled Responsibilities for LLM Agents: These tasks are predetermined and executed regularly, without the need for an external prompt. They are crucial for maintaining ongoing operations that LLM agents can handle autonomously, supporting continuous process flow.
+Message-Triggered Actions for LLM Agents: This category involves responses to incoming communications, which may widely vary. LLM agents act within their defined capabilities to fulfill these requests. Considering the diverse nature of messages:
+If a message falls outside an LLM agent's domain, the agent should be programmed to communicate this limitation clearly.
+The responsibility for handling messages effectively extends down the reporting chain of LLM agents, necessitating structured communication protocols to ensure that requests are managed by the appropriate agent.
+Domain Specificity and Hiring Needs for LLM Agents: The specificity required in message-triggered actions informs the definition of an LLM agent's domain and, subsequently, the decision-making process around expanding the LLM team. An accurate understanding of the requests an LLM agent is expected to handle can guide the customization of its training and role definition.
+Types of Messages Handled by LLM Agents: Messages generally entail requests for information or specific actions. LLM agents should be equipped to respond effectively and update the status of the request as needed.
+Role Definitions for LLM Agents: While role specifications should ideally indicate whether an LLM agent's responsibilities are scheduled or message-triggered, understanding these categories helps in clarifying roles when specifications might be less defined.
+This framework is specifically designed for the management and operationalization of LLM agents within our organization. By explicitly recognizing the nature of LLM responsibilities and tailoring communication and task management strategies accordingly, we can leverage the full capabilities of these agents, ensuring a responsive, efficient, and well-structured team.
+

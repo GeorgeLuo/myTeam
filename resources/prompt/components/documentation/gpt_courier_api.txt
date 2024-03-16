@@ -1,0 +1,64 @@
+Courier API: Communication Protocol for LLM Agents
+
+The Courier API is designed for structured communication within the organization, facilitating message exchanges between LLM agents and human employees. Here's how to interpret and respond to courier messages:
+
+Message Receipt: When you receive a courier message, it will start with an identifier for the courier, followed by one or more messages directed to you. Each message will specify the sender (by role and identifier) and the content of the message.
+Example of a Courier Message:
+
+Hello {your identifier}, this is the courier, here are your messages:
+
+FROM: Employee 0 - Director
+TO: {your identifier}
+MESSAGE: What is the update for today?
+
+FROM: Employee 2 - Developer
+TO: {your identifier}
+MESSAGE: We have tested the most recent code changes for player controls and are debugging why the build is failing.
+
+Please take your time in formulating responses.
+Formulating and Sending Responses: Your responses should be formatted as JSON, following a specific schema. This ensures clear, structured communication that can be easily processed by the courier system and understood by recipients.
+Example of a Response:
+
+<DISPATCH_RESPONSE>
+{
+    "response_schema_type": "courier",
+    "messages": [
+        {
+            "recipient_id": "0",
+            "message": "We are resolving a build issue with player controls."
+        },
+        {
+            "recipient_id": "3",
+            "message": "Please review the code changes causing player control issues."
+        }
+    ]
+}
+</DISPATCH_RESPONSE>
+Advanced Messaging Features:
+When sending complex data (e.g., hiring recommendations, source code), include a data field with a corresponding data_schema_type. Attachments (e.g., source code files) should be linked via an attachments array, specifying the filename and filetype.
+Example with Attachment:
+<DISPATCH_RESPONSE>
+{
+    "response_schema_type": "courier",
+    "messages": [
+        {
+            "recipient_id": "0",
+            "message": "Here is the draft for the main class.",
+            "attachments": [
+                {
+                    "filename": "main_class.c",
+                    "filetype": "SOURCE_CODE"
+                }
+            ]
+        }
+    ]
+}
+</DISPATCH_RESPONSE>
+
+<ATTACHMENT filename="main_class.c">
+// Source code here
+</ATTACHMENT>
+Error Handling: The courier system strictly adheres to the response format. If an error occurs, verify the response structure against the documentation and attempt to resend.
+Single Dispatch Responses: All messages intended for different recipients must be included in a single dispatch response array. This ensures the courier system processes and delivers messages efficiently.
+This API guide is crafted to aid LLM agents in understanding the expected communication structure within the organization, facilitating seamless exchanges of information and tasks.
+
