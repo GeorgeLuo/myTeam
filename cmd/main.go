@@ -70,29 +70,24 @@ func main() {
 				break
 			}
 
-			courier := courier.NewCourier(*recipientID, &ws, &llmClient)
+			dispatcher := courier.NewDispatcherImpl(&ws, &llmClient)
 
 			// Build the message to be dispatched
 			messageBuilder := &messagebuilder.MessageBuilderImpl{}
 			messageBuilder.AppendToMessage(input)
 
-			courier.AddMessage(*senderID, messageBuilder.ToString())
+			dispatcher.NewMessage(*recipientID, *senderID, messageBuilder.ToString())
+			dispatcher.DispatchCouriersAndWait()
 
-			_, _, err := courier.DispatchAndWait()
-			if err != nil {
-				fmt.Printf("Failed to dispatch the message: %v\n", err)
-				continue
-			}
-
-			attachments, messages := courier.GetMessagesByRecipient(*senderID)
-			for _, message := range messages {
+			senderToMessagesAndAttachments := dispatcher.GetResponsesByRecipient(*senderID)
+			for _, message := range senderToMessagesAndAttachments.Messages {
 				fmt.Printf("%+v\n", message.Message)
-				if len(attachments) > 0 {
+				if len(senderToMessagesAndAttachments.Attachments) > 0 {
 
 					reviewingAttachments := true
 
 					for reviewingAttachments {
-						fmt.Printf("*** SYSTEM ***\nfound %d attachment(s)\n", len(attachments))
+						fmt.Printf("*** SYSTEM ***\nfound %d attachment(s)\n", len(senderToMessagesAndAttachments.Attachments))
 						for _, attachment := range message.Attachments {
 							fmt.Printf("%s\n", attachment.Filename)
 						}
@@ -112,7 +107,7 @@ func main() {
 							break
 						}
 
-						fmt.Printf("%s", attachments[input])
+						fmt.Printf("%s", senderToMessagesAndAttachments.Attachments[input])
 					}
 				}
 				if message.DataSchemaType == "HIRING_RECOMMENDATIONS" {

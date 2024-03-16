@@ -78,7 +78,7 @@ func (c *Courier) DispatchAndWait() (response DispatchResponse, attachments map[
 			return response, attachments, err
 		}
 	} else {
-		fmt.Println("Invalid response format")
+		// TODO: if invalid response format, reply with courier documentation to refresh understanding
 		return response, attachments, fmt.Errorf("invalid response format")
 	}
 
