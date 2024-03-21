@@ -8,8 +8,8 @@ import (
 
 // HiringData represents the top-level structure of the hiring information.
 type HiringData struct {
-	HiringEmployeeID string `json:"hiring_employee_id"`
-	Roles            []Role `json:"roles"`
+	HiringAgentID string `json:"hiring_agent_id"`
+	Roles         []Role `json:"roles"`
 }
 
 // Role represents information about a specific role recommended for hiring.

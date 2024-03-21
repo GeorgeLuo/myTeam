@@ -4,7 +4,7 @@ The following is documentation of how presentation of recommended hires should b
 
 {
     "response_schema_type": "HIRING_RECOMMENDATIONS",
-    "hiring_employee_id": {your employee id},
+    "hiring_agent_id": {your employee id},
     "roles": [
         {
             "title": {title of first recommendation},

@@ -130,7 +130,7 @@ func main() {
 					if strings.TrimSpace(approveResponse) == "y" {
 						for _, role := range hiringData.Roles {
 
-							description := "A direct report to Employee " + fmt.Sprint(hiringData.HiringEmployeeID) + " with title of " + role.Title
+							description := "A direct report to Employee " + fmt.Sprint(hiringData.HiringAgentID) + " with title of " + role.Title
 							name := role.Pseudonym
 
 							agentPromptBuilder := promptbuilder.NewAgentPromptBuilderImpl()
@@ -143,11 +143,11 @@ func main() {
 							}
 							agentPromptBuilder.AddOrgMetadata("NAME", name)
 
-							agentPromptBuilder.AddUnderstandingFromFile("resources/prompt/components/gpt_delegation_capabilities.txt")
-							agentPromptBuilder.AddUnderstandingFromFile("resources/prompt/components/gpt_defining_responsibilities.txt")
-							agentPromptBuilder.AddUnderstandingFromFile("resources/prompt/components/gpt_defining_communication.txt")
-							agentPromptBuilder.AddUnderstandingFromFile("resources/prompt/components/documentation/gpt_courier_api.txt")
-							agentPromptBuilder.AddUnderstandingFromFile("resources/prompt/components/documentation/gpt_hiring_api.txt")
+							agentPromptBuilder.AddUnderstandingFromFile("resources/prompt/components/delegation_capabilities.txt")
+							agentPromptBuilder.AddUnderstandingFromFile("resources/prompt/components/defining_responsibilities.txt")
+							agentPromptBuilder.AddUnderstandingFromFile("resources/prompt/components/defining_communication.txt")
+							agentPromptBuilder.AddUnderstandingFromFile("resources/prompt/components/documentation/courier_api.txt")
+							agentPromptBuilder.AddUnderstandingFromFile("resources/prompt/components/documentation/hiring_api.txt")
 
 							for _, responsibility := range role.Responsibilities {
 								agentPromptBuilder.AddFunction(responsibility.Description)

@@ -1,6 +1,6 @@
 Courier API: Communication Protocol for LLM Agents
 
-The Courier API is designed for structured communication within the organization, facilitating message exchanges between LLM agents and human employees. Here's how to interpret and respond to courier messages:
+The Courier API is designed for structured communication within the organization, facilitating message exchanges between LLM agents and human agents. Here's how to interpret and respond to courier messages:
 
 Message Receipt: When you receive a courier message, it will start with an identifier for the courier, followed by one or more messages directed to you. Each message will specify the sender (by role and identifier) and the content of the message.
 Example of a Courier Message:
@@ -34,8 +34,11 @@ Example of a Response:
     ]
 }
 </DISPATCH_RESPONSE>
+
 Advanced Messaging Features:
-When sending complex data (e.g., hiring recommendations, source code), include a data field with a corresponding data_schema_type. Attachments (e.g., source code files) should be linked via an attachments array, specifying the filename and filetype.
+
+Attachments (e.g., source code files) should be linked via an attachments array, specifying the filename and filetype.
+
 Example with Attachment:
 <DISPATCH_RESPONSE>
 {
@@ -58,6 +61,29 @@ Example with Attachment:
 <ATTACHMENT filename="main_class.c">
 // Source code here
 </ATTACHMENT>
+
+When sending complex data (e.g., hiring recommendations), include a data field with a corresponding data_schema_type.
+
+<DISPATCH_RESPONSE>
+
+{
+    "response_schema_type": "courier",
+    "messages": [
+        {
+            "recipient_id": "0",
+            "message": "Attached is the hiring recommendations",
+            "data_schema_type": "HIRING_RECOMMENDATIONS",
+            "data": {
+                "response_schema_type": "HIRING_RECOMMENDATIONS",
+                "hiring_agent_id": "LLM_HIRING_AGENT_ID",
+                ...
+            }
+        }
+    ]
+}
+
+</DISPATCH_RESPONSE>
+
 Error Handling: The courier system strictly adheres to the response format. If an error occurs, verify the response structure against the documentation and attempt to resend.
 Single Dispatch Responses: All messages intended for different recipients must be included in a single dispatch response array. This ensures the courier system processes and delivers messages efficiently.
 This API guide is crafted to aid LLM agents in understanding the expected communication structure within the organization, facilitating seamless exchanges of information and tasks.

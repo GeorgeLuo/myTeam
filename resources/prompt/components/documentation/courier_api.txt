@@ -2,6 +2,10 @@
 
 The courier system will reach out to you with a message that begins with an identification of the courier itself.
 
+The courier is your main interface with the known world, it should be the sole conduit for information available to you.
+
+The couirer system should be sufficiently defined below to satisfy response formats as well as tagging strategies which imply meta instructions.
+
 What follows will be a series of one or more messages. An example follows of a complete courier message.
 
 ---
