@@ -143,9 +143,10 @@ func main() {
 							}
 							agentPromptBuilder.AddOrgMetadata("NAME", name)
 
-							agentPromptBuilder.AddUnderstandingFromFile("resources/prompt/components/delegation_capabilities.txt")
-							agentPromptBuilder.AddUnderstandingFromFile("resources/prompt/components/defining_responsibilities.txt")
-							agentPromptBuilder.AddUnderstandingFromFile("resources/prompt/components/defining_communication.txt")
+							agentPromptBuilder.AddUnderstandingFromFile("resources/prompt/components/delegation/delegation_capabilities.txt")
+							agentPromptBuilder.AddUnderstandingFromFile("resources/prompt/components/delegation/defining_responsibilities.txt")
+							agentPromptBuilder.AddUnderstandingFromFile("resources/prompt/components/delegation/defining_communication.txt")
+
 							agentPromptBuilder.AddUnderstandingFromFile("resources/prompt/components/documentation/courier_api.txt")
 							agentPromptBuilder.AddUnderstandingFromFile("resources/prompt/components/documentation/hiring_api.txt")
 

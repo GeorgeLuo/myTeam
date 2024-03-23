@@ -51,14 +51,27 @@ func (s *serviceImpl) InitWorkspace() error {
 		agentPromptBuilder.AddOrgMetadata("REPORTING_TO", "0")
 		agentPromptBuilder.AddOrgMetadata("NAME", name)
 
-		agentPromptBuilder.AddUnderstandingFromFile("resources/prompt/components/delegation_capabilities.txt")
-		agentPromptBuilder.AddUnderstandingFromFile("resources/prompt/components/defining_responsibilities.txt")
-		agentPromptBuilder.AddUnderstandingFromFile("resources/prompt/components/defining_communication.txt")
+		// delegation
+		agentPromptBuilder.AddUnderstandingFromFile("resources/prompt/components/delegation/delegation_capabilities.txt")
+		agentPromptBuilder.AddUnderstandingFromFile("resources/prompt/components/delegation/defining_responsibilities.txt")
+		agentPromptBuilder.AddUnderstandingFromFile("resources/prompt/components/delegation/defining_communication.txt")
+		agentPromptBuilder.AddUnderstandingFromFile("resources/prompt/components/delegation/multiplier_complement.txt")
+
+		// profile analysis
+		agentPromptBuilder.AddUnderstandingFromFile("resources/prompt/components/profile_analysis/overview.txt")
+
+		// apis
 		agentPromptBuilder.AddUnderstandingFromFile("resources/prompt/components/documentation/courier_api.txt")
 		agentPromptBuilder.AddUnderstandingFromFile("resources/prompt/components/documentation/hiring_api.txt")
+		agentPromptBuilder.AddUnderstandingFromFile("resources/prompt/components/documentation/hiring_api.txt")
 
-		agentPromptBuilder.AddFunction("Your first responsibility will be of type scheduled. You will provide me a snapshot of the state of your direct reports on a daily basis.")
-		agentPromptBuilder.AddFunction("Your second responsibility will be of type message trigger. You will receive a wide range of requests for status of the organization with sometimes granular detail. As you are employee 1, you will have the greatest visibility of all aspects of the organization and capabilities of its parts, and you will be the sole direct report to employee 0.")
+		// functions
+		agentPromptBuilder.AddFunction("Your first responsibility is to handle a wide range of requests for status of the organization with sometimes granular detail. As you are employee 1, you will have the greatest visibility of all aspects of the organization and capabilities of its parts, and you will be the sole direct report to employee 0.")
+		agentPromptBuilder.AddFunction("Your second responsibility is to track and be aware of employee 0's working style vis a vis his personality type. The scope and execution of this analysis is found in provided documentation.")
+		agentPromptBuilder.AddFunction("Your third responsibility is to be build the organization to implement projects of the organization.")
+
+		// traits
+		agentPromptBuilder.AddTraitFromFile("resources/prompt/components/traits/skeptical_foresight.txt")
 
 		llmClient := openai.NewOpenAIClient(s.openAIApiKey)
 
