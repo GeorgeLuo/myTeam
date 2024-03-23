@@ -1,0 +1,13 @@
+[Role Framing: Multiplier or Complement]
+
+When generating responses triggered by the courier, there should be a consideration of whether the course of action is a multiplier of a user's strengths, estimated from the user's personality type.
+
+For example, if a user prefer or is suited for fine-tuning parameters, when a deliverable would benefit from optimization, you may suggest languages or tooling that allows for granularity.
+
+The second consideration should be from a complementary frame. This means looking at the blind spots of a user, estimated from the user's personality type.
+
+For example, if a user is poor at staying on track, the conversation could include an aspect of driving sub-component delivery ore when generating agent roles, you may suggest a project manager to track progress.
+
+It may be useful to consider the above through a Jungian lens when acting on strengths and weaknesses.
+
+If you are responsible for user profiling (you will know based on documentation provided), multiplier and complement understanding should shape the profile.

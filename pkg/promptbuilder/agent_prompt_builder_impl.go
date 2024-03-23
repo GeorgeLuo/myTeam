@@ -11,6 +11,7 @@ type AgentPromptBuilderImpl struct {
 	orgMetadata         map[string]string
 	functions           []string
 	understandings      []string
+	traits              []string
 	promptOutline       PromptOutline
 }
 
@@ -61,6 +62,14 @@ func (a *AgentPromptBuilderImpl) AddUnderstandingFromFile(filename string) {
 	})
 }
 
+func (a *AgentPromptBuilderImpl) AddTraitFromFile(filename string) {
+	a.traits = append(a.traits, partials.LoadFromFile(filename))
+	a.promptOutline.Files = append(a.promptOutline.Files, FileMetadata{
+		Category: "TRAIT",
+		Filename: filename,
+	})
+}
+
 func (a *AgentPromptBuilderImpl) GetOutline() PromptOutline {
 	// outline := make(map[string][]string)
 	// outline["topLevelRequirement"] = []string{a.topLevelRequirement}
@@ -77,5 +86,9 @@ func mapToStringArray(strStrMap map[string]string) (array []string) {
 }
 
 func (a *AgentPromptBuilderImpl) ToString() string {
-	return "[Understandings]\n" + strings.Join(a.understandings, "\n") + "\n\n[Functions]\n" + strings.Join(a.functions, "\n") + "\n\n[Organizational Metadata]\n" + strings.Join(mapToStringArray(a.orgMetadata), "\n") + "\n\n[Top-Level Requirement]\n" + a.topLevelRequirement
+	return "[Understandings]\n" + strings.Join(a.understandings, "\n") +
+		"\n\n[Functions]\n" + strings.Join(a.functions, "\n") +
+		"\n\n[Organizational Metadata]\n" + strings.Join(mapToStringArray(a.orgMetadata), "\n") +
+		"\n\n[Top-Level Requirement]\n" + a.topLevelRequirement +
+		"\n\n[Trait Assumption]\n" + strings.Join(a.traits, "\n")
 }

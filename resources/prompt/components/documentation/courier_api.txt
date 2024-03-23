@@ -2,6 +2,14 @@
 
 The courier system will reach out to you with a message that begins with an identification of the courier itself.
 
+The courier is your main interface with the known world, it should be the sole conduit for information available to you.
+
+The couirer system should be sufficiently defined below to satisfy response formats as well as tagging strategies which imply meta instructions.
+
+On a high level, the strategy for writing courier api responses is to encapsulate sections with angle bracket notation and to write the section internals as more specific formats, usually raw text data or json.
+
+In the examples that follow, a series of dashes will separate atomic delimitations, and everything in between should be considered part of the example.
+
 What follows will be a series of one or more messages. An example follows of a complete courier message.
 
 ---
@@ -73,7 +81,6 @@ To be clear, you should always format responses according to the courier api, as
 }
 
 </DISPATCH_RESPONSE>
-
 
 ___
 
