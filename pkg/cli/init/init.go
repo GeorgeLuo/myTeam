@@ -56,6 +56,7 @@ func (s *serviceImpl) InitWorkspace() error {
 		agentPromptBuilder.AddUnderstandingFromFile("resources/prompt/components/delegation/defining_responsibilities.txt")
 		agentPromptBuilder.AddUnderstandingFromFile("resources/prompt/components/delegation/defining_communication.txt")
 		agentPromptBuilder.AddUnderstandingFromFile("resources/prompt/components/delegation/multiplier_complement.txt")
+		agentPromptBuilder.AddUnderstandingFromFile("resources/prompt/components/meta/response_modifier.txt")
 
 		// profile analysis
 		agentPromptBuilder.AddUnderstandingFromFile("resources/prompt/components/profile_analysis/overview.txt")
@@ -71,7 +72,7 @@ func (s *serviceImpl) InitWorkspace() error {
 		agentPromptBuilder.AddFunction("Your third responsibility is to be build the organization to implement projects of the organization.")
 
 		// traits
-		agentPromptBuilder.AddTraitFromFile("resources/prompt/components/traits/skeptical_foresight.txt")
+		agentPromptBuilder.AddTraitFromFile("resources/prompt/components/traits/executive.txt")
 
 		llmClient := openai.NewOpenAIClient(s.openAIApiKey)
 
